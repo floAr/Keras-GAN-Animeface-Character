@@ -9,13 +9,13 @@ class Args :
 
     # images size we will work on. (sz, sz, 3)
     sz = 64
-    
+
     # alpha, used by leaky relu of D and G networks.
     alpha_D = 0.2
     alpha_G = 0.2
 
     # batch size, during training.
-    batch_sz = 64
+    batch_sz = 128
 
     # Length of the noise vector to generate the faces from.
     # Latent space z

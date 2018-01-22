@@ -67,12 +67,13 @@ def build_discriminator( shape, build_disc=True ) :
 
     x = conv2d( x, 128 )
     # 16x16
-
+    x= Dropout(0.2)(x)
     x = conv2d( x, 256 )
     # 8x8
-
+    x= Dropout(0.2)(x)
     x = conv2d( x, 512 )
     # 4x4
+    x= Dropout(0.2)(x)
 
     if build_disc:
         x = Flatten()(x)
@@ -101,12 +102,12 @@ def build_gen( shape ) :
         '''
         # Simpe Conv2DTranspose
         # Not good, compared to upsample + conv2d below.
-        x= Conv2DTranspose( filters, shape, padding='same',
-            strides=(2, 2), kernel_initializer=Args.kernel_initializer )(x)
+        #x= Conv2DTranspose( filters, shape, padding='same',
+        #    strides=(2, 2), kernel_initializer=Args.kernel_initializer )(x)
 
         # simple and works
-        #x = UpSampling2D( (2, 2) )( x )
-        #x = Conv2D( filters, shape, padding='same' )( x )
+        x = UpSampling2D( (2, 2) )( x )
+        x = Conv2D( filters, shape, padding='same' )( x )
 
         # Bilinear2x... Not sure if it is without bug, not tested yet.
         # Tend to make output blurry though
@@ -131,10 +132,13 @@ def build_gen( shape ) :
     x = LeakyReLU(alpha=Args.alpha_G)( x )
     # 4x4
     x = deconv2d( x, 256 )
+    x= Dropout(0.2)(x)
     # 8x8
     x = deconv2d( x, 128 )
+    x= Dropout(0.2)(x)
     # 16x16
     x = deconv2d( x, 64 )
+    x= Dropout(0.2)(x)
     # 32x32
 
     # Extra layer

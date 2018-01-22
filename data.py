@@ -50,7 +50,7 @@ def make_hdf5(ofname, wildcard):
             fnames.append(random.choice(pool))
 
     with h5py.File(ofname, "w") as f:
-        faces = f.create_dataset("faces", (len(fnames), Args.sz, Args.sz, 3), dtype='f')
+        faces = f.create_dataset("cars", (len(fnames), Args.sz, Args.sz, 3), dtype='f')
 
         for i, fname in enumerate(fnames):
             print(fname)
@@ -65,7 +65,7 @@ def test(hdff):
     Reads in hdf file and check if pixels are scaled in [-1, 1] range.
     '''
     with h5py.File(hdff, "r") as f:
-        X = f.get("faces")
+        X = f.get("cars")
         print(np.min(X[:,:,:,0]))
         print(np.max(X[:,:,:,0]))
         print(np.min(X[:,:,:,1]))
@@ -81,7 +81,7 @@ def test(hdff):
 if __name__ == "__main__" :
     # Thankfully the dataset is in PNG, not JPEG.
     # Anime style suffers from significant quality degradation in JPEG.
-    make_hdf5("data.hdf5", "animeface-character-dataset/thumb/*/*.png")
+    make_hdf5("data.hdf5", "C:\Projekte\PhD\Data\CarData\car_ims\*.jpg")
     #make_hdf5("data.hdf5", "animeface-character-dataset/thumb/025*/*.png")
 
     # Uncomment and run test, if you want.

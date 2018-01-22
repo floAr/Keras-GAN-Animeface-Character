@@ -106,8 +106,8 @@ def build_networks():
 
     # vague faces @ 500
     # Still can't get higher frequency component.
-    #dopt = Adam(lr=0.0010, beta_1=0.5)
-    #opt  = Adam(lr=0.0001, beta_1=0.5)
+    dopt = Adam(lr=0.0010, beta_1=0.5)
+    opt  = Adam(lr=0.0001, beta_1=0.5)
 
     # better faces @ 500
     # but mode collapse after that, probably due to learning rate being too high.
@@ -115,8 +115,8 @@ def build_networks():
     # now same lr, as we are using history to train D multiple times.
     # I don't exactly understand how decay parameter in Adam works. Certainly not exponential.
     # Actually faster than exponential, when I look at the code and plot it in Excel.
-    dopt = Adam(lr=0.0002, beta_1=Args.adam_beta)
-    opt  = Adam(lr=0.0001, beta_1=Args.adam_beta)
+    #dopt = Adam(lr=0.0002, beta_1=Args.adam_beta)
+    #opt  = Adam(lr=0.0001, beta_1=Args.adam_beta)
 
     # too slow
     # Another thing about LR.
@@ -156,7 +156,7 @@ def train_autoenc( dataf ):
     Train an autoencoder first to see if your network is large enough.
     '''
     f = h5py.File( dataf, 'r' )
-    faces = f.get( 'faces' )
+    faces = f.get( 'cars' )
 
     opt = Adam(lr=0.001)
 
@@ -217,8 +217,8 @@ def train_gan( dataf ) :
     logger = CSVLogger('loss.csv') # yeah, you can use callbacks independently
     logger.on_train_begin() # initialize csv file
     with h5py.File( dataf, 'r' ) as f :
-        faces = f.get( 'faces' )
-        run_batches(gen, disc, gan, faces, logger, range(5000))
+        faces = f.get( 'cars' )
+        run_batches(gen, disc, gan, faces, logger, range(150000))
     logger.on_train_end()
 
 
@@ -235,7 +235,7 @@ def run_batches(gen, disc, gan, faces, logger, itr_generator):
         reals = sample_faces( faces )
         # Add noise...
         # My dataset works without this.
-        #reals += 0.5 * np.exp(-batch/100) * np.random.normal( size=reals.shape )
+        reals += 0.5 * np.exp(-batch/100) * np.random.normal( size=reals.shape )
 
         if batch % 10 == 0 :
             if len(history) > Args.history_sz:
@@ -247,7 +247,7 @@ def run_batches(gen, disc, gan, faces, logger, itr_generator):
         d_loss1 = disc.train_on_batch( reals, lbl_real )
         d_loss0 = disc.train_on_batch( fakes, lbl_fake )
         gen.trainable = True
-       
+
         #if d_loss1 > 15.0 or d_loss0 > 15.0 :
         # artificial training of one of G or D based on
         # statistics is not good at all.
@@ -272,7 +272,7 @@ def run_batches(gen, disc, gan, faces, logger, itr_generator):
         if batch % 10 == 0 and batch != 0 :
             end_of_batch_task(batch, gen, disc, reals, fakes)
             row = {"d_loss0": d_loss0, "d_loss1": d_loss1, "g_loss": g_loss}
-            logger.on_epoch_end(batch, row)
+            #logger.on_epoch_end(batch, row)
 
 
 
