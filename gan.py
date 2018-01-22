@@ -212,7 +212,11 @@ def load_weights(model, wf):
 
 def train_gan( dataf ) :
     gen, disc, gan = build_networks()
-
+    aetros_callback = job.create_keras_callback(
+    gen,
+    insights=True, insights_x=X_train[0],
+    confusion_matrix=True, validation_data=(X_test, Y_test)
+    )
     # Uncomment these, if you want to continue training from some snapshot.
     # (or load pretrained generator weights)
     #load_weights(gen, Args.genw)
@@ -313,11 +317,7 @@ def generate( genw, cnt ):
     gen.compile(optimizer='sgd', loss='mse')
     load_weights(gen, Args.genw)
 
-    aetros_callback = job.create_keras_callback(
-    gen,
-    insights=True, insights_x=X_train[0],
-    confusion_matrix=True, validation_data=(X_test, Y_test)
-    )
+
 
     generated = gen.predict(binary_noise(Args.batch_sz))
     # Unoffset, in batch.
