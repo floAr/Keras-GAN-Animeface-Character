@@ -16,6 +16,10 @@ from data import denormalize4gan
 from discrimination import MinibatchDiscrimination
 from nets import build_discriminator, build_gen, build_enc
 
+import aetros.backend
+
+job = aetros.backend.context()
+
 #import tensorflow as tf
 #import keras
 #keras.backend.get_session().run(tf.initialize_all_variables())
@@ -215,6 +219,7 @@ def train_gan( dataf ) :
     #load_weights(disc, Args.discw)
 
     logger = CSVLogger('loss.csv') # yeah, you can use callbacks independently
+
     logger.on_train_begin() # initialize csv file
     with h5py.File( dataf, 'r' ) as f :
         faces = f.get( 'cars' )
@@ -308,6 +313,12 @@ def generate( genw, cnt ):
     gen.compile(optimizer='sgd', loss='mse')
     load_weights(gen, Args.genw)
 
+    aetros_callback = job.create_keras_callback(
+    gen,
+    insights=True, insights_x=X_train[0],
+    confusion_matrix=True, validation_data=(X_test, Y_test)
+    )
+
     generated = gen.predict(binary_noise(Args.batch_sz))
     # Unoffset, in batch.
     # Must convert back to unit8 to stop color distortion.
@@ -324,6 +335,8 @@ def main( argv ) :
         os.mkdir(Args.snapshot_dir)
     if not os.path.exists(Args.anim_dir) :
         os.mkdir(Args.anim_dir)
+
+
 
     # test the capability of generator network through autoencoder test.
     # The argument is that if the generator network can memorize the inputs then
